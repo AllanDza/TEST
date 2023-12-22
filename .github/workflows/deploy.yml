@@ -1,0 +1,49 @@
+# .github/workflows/deploy.yml
+
+name: Deploy Flask App to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Deploy Infrastructure
+      run: |
+        cd terraform
+        terraform init
+        terraform apply -auto-approve
+      env:
+        TF_VAR_aws_access_key = ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_aws_secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_aws_region      = "us-east-1"  # Change to your desired region
+
+    - name: Display Instance IP
+      run: echo "Instance IP: ${{ steps.deploy.outputs.instance_ip }}"
+      id: deploy
+      env:
+        TF_VAR_aws_access_key = ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_aws_secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_aws_region      = "us-east-1"  # Change to your desired region
+
+    - name: Deploy Flask App
+      run: |
+        instance_ip="${{ steps.deploy.outputs.instance_ip }}"
+        scp -i path/to/your/private-key.pem -o StrictHostKeyChecking=no -r . ubuntu@$instance_ip:/home/ubuntu/flask-app
