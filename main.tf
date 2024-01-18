@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "your_aws_region"
+  region = "us-east-1"
 }
 
 resource "aws_elastic_beanstalk_application" "flask_app" {
