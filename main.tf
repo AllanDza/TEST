@@ -10,7 +10,7 @@ resource "aws_elastic_beanstalk_application" "flask_app" {
 resource "aws_elastic_beanstalk_environment" "flask_env" {
   name        = "compmast_env"
   application = aws_elastic_beanstalk_application.flask_app.name
-  solution_stack_name = "64bit Amazon Linux 2 v5.4.0 running Python 3.8"
+  solution_stack_name = "64bit Amazon Linux 2 v5.4.0 running Python 3.8.10"
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
